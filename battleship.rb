@@ -1,7 +1,7 @@
 require "./test_index.rb" # to include AITestSuite module, for AI functions
 require "./better_algorithm.rb" # a better way to choose what to attack next
 $winner = nil # tells parser who the winner is; nil = game not over
-$testing = true # not used at present
+$testing = false # not used at present
 $message = '' # stuff that is saved to be displayed to the user after the board
 $random = true # half the time, the computer guesses randomly
 
@@ -87,7 +87,7 @@ class Board
     x = 0
     y = 0
     valid_start = false
-    $message << "You attack! "
+    $message << "You attack! " unless $setup == true
     until valid_start
       if type[0]
         puts "Where do you want the top/left edge of your #{type[0]}? "
@@ -369,7 +369,7 @@ class PlayerBoard < Board
   def initialize (pc)
     super
     self.pc = "player" # is there a way to avoid this??
-    puts "Let's set up your board!"
+    puts "Let's set up your board!\n\n"
     place(5, "carrier")
     place(4, "battleship")
     place(3, "warship")
@@ -571,13 +571,23 @@ def message
 end
 
 def setup_game
+  $setup = true # turns off an irrelevant message
+  system ("cls")
+  puts "######################"
+  puts "Welcome to Battleship!"
+  puts "To play, first you'll place your battleships on a 10x10 grid."
+  puts "Then you'll take shots (also on the grid) at the enemy's area"
+  puts "to eliminate their ships. They will be shooting at you, too!"
+  puts "Sink all the enemy's ships before yours are sunk!"
+  puts "######################\n\n"
   computer_board = ComputerBoard.new("computer")
-  computer_board.display_board # for testing
+  # computer_board.display_board # for testing
   player_board = PlayerBoard.new("player")
-  player_board.display_board unless $testing
   player_board.player_view = player_board.generate_blank_board
+  player_board.display_board unless $testing
   $message << "Setup complete! Let's play! "
   message
+  $setup = false
   return computer_board, player_board
 end
 
