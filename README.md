@@ -2,7 +2,7 @@
 `ruby battleship.rb`
 
 #### Setup
-Make sure Ruby is installed on your system. Run the program from the command line. (Of course we'd love to see a web or desktop version of this.)
+Make sure Ruby is installed on your system. Run battleship.rb from the command line. The only other file needed to run the program is better_algorithm.rb. (Of course we'd love to see a web or desktop version of this.)
 
 Run the program and follow the on-screen prompts.
 
