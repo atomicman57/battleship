@@ -1,13 +1,3 @@
-require "./battleship_methods.rb"
-
-$winner = nil # tells parser who the winner is; nil = game not over
-$testing = false # not used at present
-$message = '' # stuff that is saved to be displayed to the user after the board
-$random = true # half the time, the computer guesses randomly
-
-############
-## CLASSES #
-############
 class Board
   # my first mixin!
   include AITestSuite # separating complicated AI for clarity
@@ -87,7 +77,7 @@ class Board
     x = 0
     y = 0
     valid_start = false
-    $message << "You attack! " unless $setup == true
+    $message << "You attack! "
     until valid_start
       if type[0]
         puts "Where do you want the top/left edge of your #{type[0]}? "
@@ -95,7 +85,7 @@ class Board
         print "Missile ready to launch. Coordinate? "
       end
       print "E.g., a1: "
-      coords = gets.chomp
+      coords = Input.get_coordinates
       begin
         x = coords[0]
         coords[0] = ''
@@ -255,35 +245,6 @@ class Board
 
 end
 
-class Ship
-  attr_accessor :type, :char, :length, :x, :y, :orientation, :points
-
-  def initialize (options)
-    self.type = options[:type]
-    self.char = options[:type][0].upcase
-    self.length = options[:length]
-    self.x = options[:x]
-    self.y = options[:y]
-    self.orientation = options[:orientation]
-    initialize_ship_points
-  end
-
-  def initialize_ship_points
-    # a hash of ship points, with keys = an array of coordinates
-    # and values = state of that point ('.' or '#')
-    self.points = {}
-    if orientation == 0 # vertical
-      length.times do |n|
-        points[[x, y+n]] = "."
-      end
-    else # horizontal
-      length.times do |n|
-        points[[x+n, y]] = "."
-      end
-    end
-  end
-end
-
 class ComputerBoard < Board
 
   def initialize (pc)
@@ -369,7 +330,7 @@ class PlayerBoard < Board
   def initialize (pc)
     super
     self.pc = "player" # is there a way to avoid this??
-    puts "Let's set up your board!\n\n"
+    puts "Let's set up your board!"
     place(5, "carrier")
     place(4, "battleship")
     place(3, "warship")
@@ -436,7 +397,7 @@ class PlayerBoard < Board
       orient = ""
       until valid_orientation
         print "Do you want your #{type} [h]orizontal or [v]ertical? "
-        orient = gets.chomp
+        orient = Input.get_orientation
         if (orient == "h")
           orientation = 1
           valid_orientation = true
@@ -560,110 +521,11 @@ class PlayerBoard < Board
 
 end
 
-############
-## METHODS #
-############
-# This is called just after displaying a board, so that messages appear
-# below the board instead of above them.
-def message
-  puts $message
-  $message = ''
-end
-
-def setup_game
-  $setup = true # turns off an irrelevant message
-  system ("cls")
-  puts "######################"
-  puts "Welcome to Battleship!"
-  puts "To play, first you'll place your battleships on a 10x10 grid."
-  puts "Then you'll take shots (also on the grid) at the enemy's area"
-  puts "to eliminate their ships. They will be shooting at you, too!"
-  puts "Sink all the enemy's ships before yours are sunk!"
-  puts "######################\n\n"
-  computer_board = ComputerBoard.new("computer")
-  # computer_board.display_board # for testing
-  player_board = PlayerBoard.new("player")
-  player_board.player_view = player_board.generate_blank_board
-  player_board.display_board unless $testing
-  $message << "Setup complete! Let's play! "
-  message
-  $setup = false
-  return computer_board, player_board
-end
-
-def flip_to_see_who_goes_first
-  result = rand(2)
-  return nil if result == 0
-  "player"
-end
-
-def player_turn (computer_board, player_board)
-  $message << "Your turn! "
-  hit = true # to get into the while loop
-  # continue as long as player is hitting
-  while hit == true
-    hit = false # hasn't hit yet
-    # show player what he knows of enemy board
-    computer_board.show_player_view
-    valid_coords = false
-    until valid_coords
-      x, y = computer_board.get_valid_coords
-      # determine_damage returns 'false' if already attacked coords
-      hit, valid_coords = computer_board.determine_damage(x, y)
-      return if $winner
-    end
+class Input
+  def self.get_coordinates
+    gets.chomp
   end
-  # show player view of computer board at end of player turn
-  computer_board.show_player_view
-  print "Enter to continue..."
-  gets
-end
-
-def computer_turn (computer_board, player_board)
-  $message << "The enemy attacks! "
-  hit = true # to get into the while loop
-  # continue as long as player is hitting
-  while hit == true
-    hit = false # hasn't hit yet
-    valid_coords = false
-    until valid_coords
-      x, y = player_board.determine_computer_coords
-      # determine_damage returns 'false' if already attacked coords
-      hit, valid_coords = player_board.determine_damage(x, y)
-      # show player his own board, with new damage done
-      player_board.show_player_view_of_player
-      return if $winner
-      print "Enter to continue..."
-      gets
-    end
+  def self.get_orientation
+    gets.chomp
   end
-end
-
-def play_game
-  computer_board, player_board = setup_game
-  player_move = flip_to_see_who_goes_first
-  puts "The #{player_move ? "player" : "computer"} won the toss."
-  # code to play game goes here
-  until $winner # i.e., until a winner is determined
-    player_move ? player_turn(computer_board, player_board) :
-      computer_turn(computer_board, player_board)
-    # toggle until game ends
-    player_move ? player_move = false : player_move = true
-  end
-  return computer_board, player_board
-end
-
-def report_and_prompt(computer_board, player_board)
-  $winner == "computer" ? player_board.show_player_view_of_player :
-    computer_board.show_player_view
-  puts "The winner of this round is the #{$winner}!"
-end
-
-# enclosing loop
-game_on = true
-while game_on == true
-  computer_board, player_board = play_game
-  # reports results and prompts for another game
-  report_and_prompt(computer_board, player_board)
-  game_on = false
 end
