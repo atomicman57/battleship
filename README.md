@@ -21,6 +21,8 @@ There may be some bugs. There may also be some puzzling text that appears on the
 ### How to test
 There are no unit tests set up yet. Developers are encouraged to develop some.
 
+`bundle exec rspec spec` will run the current available test(s).
+
 ### Developer notes
 This battleship game was started by Larry Sanger as his first "big" project written in Ruby. Larry learned Perl back in 2002 but never used it professionally. He has helped to start many websites, but never as a programmer. He's decided that his project management skills would be enhanced by learning actual coding. So he started learning Ruby (in order to learn Rails) in June 2016.
 
