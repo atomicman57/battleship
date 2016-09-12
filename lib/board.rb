@@ -77,7 +77,7 @@ class Board
     x = 0
     y = 0
     valid_start = false
-    $message << "You attack! "
+    $message << "You attack! " unless $setup == true
     until valid_start
       if type[0]
         puts "Where do you want the top/left edge of your #{type[0]}? "
@@ -330,7 +330,7 @@ class PlayerBoard < Board
   def initialize (pc)
     super
     self.pc = "player" # is there a way to avoid this??
-    puts "Let's set up your board!"
+    puts "Let's set up your board!\n\n"
     place(5, "carrier")
     place(4, "battleship")
     place(3, "warship")
